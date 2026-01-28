@@ -11,7 +11,7 @@ import { Worker } from "node:worker_threads";
 // >> C:\Users\kouki\root\playground\node\node_modules\zx\package.json
 // >> 2026/01/28 10:43.
 
-function runInWorker(scriptPath, args) {
+function runInWorker(scriptPath, args = [], input = "") {
 	return new Promise((resolve, reject) => {
 		const workerCode = `
       import { workerData } from 'node:worker_threads';
@@ -27,12 +27,19 @@ function runInWorker(scriptPath, args) {
 			eval: true,
 			type: "module",
 			workerData: { path: scriptPath, args },
+			stdin: true,
 			stdout: true,
 			stderr: true,
 		});
 
 		let output = "";
 		let errorOutput = "";
+
+		// 1. 入力文字列がある場合、Workerのstdinに書き込む
+		if (input) {
+			worker.stdin.write(input);
+			worker.stdin.end(); // 入力の終わりを伝える（重要）
+		}
 
 		worker.stdout.on("data", (chunk) => {
 			// console.log(chunk.toString());
@@ -56,14 +63,14 @@ function runInWorker(scriptPath, args) {
 	});
 }
 
-export async function ctm(specifier, options = []) {
+export async function ctm(specifier, options = [], input = "") {
 	const cliPath = await import.meta.resolve(specifier);
 	// console.log(cliPath);
 
 	const cliPath2 = fileURLToPath(cliPath);
 	// console.log(cliPath2);
 
-	const result = await runInWorker(cliPath2, options);
+	const result = await runInWorker(cliPath2, options, input);
 	// console.log(result);
 	return result;
 }
