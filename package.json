@@ -1,0 +1,33 @@
+{
+	"name": "@kokiito0926/cli-to-module",
+	"version": "0.0.0",
+	"private": false,
+	"description": "CLI to Moduleを用いると、CLIをモジュール化することができます。",
+	"keywords": [
+		"cli",
+		"module",
+		"nodejs",
+		"cli-to-module"
+	],
+	"homepage": "https://github.com/kokiito0926/cli-to-module#readme",
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./index.js",
+	"bugs": {
+		"url": "https://github.com/kokiito0926/cli-to-module/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kokiito0926/cli-to-module.git"
+	},
+	"license": "MIT",
+	"author": "Koki Ito <kokiito0926@gmail.com>",
+	"type": "module",
+	"scripts": {
+		"test": "node --test"
+	},
+	"engines": {
+		"node": ">=24.0.0"
+	}
+}
