@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-import { ctm } from "./index.js";
+import { cli2module } from "./index.js";
 
-// const result = await ctm("zx/cli", []);
-const result = await ctm("zx/cli", ["--help"]);
-// const result = await ctm("zx/cli", ["--version"]);
+// const result = await cli2module("zx/cli", []);
+const result = await cli2module("zx/cli", ["--help"]);
+// const result = await cli2module("zx/cli", ["--version"]);
 console.log(result);
 console.log(result?.code);
 console.log(result?.stdout);
 console.log(result?.stderr);
 
-const result2 = await ctm("zx/cli", [], 'console.log("Hello, world!")');
+const result2 = await cli2module("zx/cli", [], 'console.log("Hello, world!")');
 console.log(result2);
 console.log(result2?.code);
 console.log(result2?.stdout);

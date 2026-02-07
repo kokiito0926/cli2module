@@ -60,7 +60,7 @@ function runInWorker(scriptPath, args = [], input = "") {
 	});
 }
 
-export async function ctm(specifier, options = [], input = "") {
+export async function cli2module(specifier, options = [], input = "") {
 	const cliPath = await import.meta.resolve(specifier);
 	// console.log(cliPath);
 

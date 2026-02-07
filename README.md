@@ -15,9 +15,9 @@ $ npm install @kokiito0926/cli2module
 CLIのツールを指定して、コマンドライン引数を配列で渡します。
 
 ```javascript
-import { ctm } from "@kokiito0926/cli2module";
+import { cli2module } from "@kokiito0926/cli2module";
 
-const result = await ctm("zx/cli", ["--help"]);
+const result = await cli2module("zx/cli", ["--help"]);
 console.log(result.code);
 console.log(result.stdout);
 console.log(result.stderr);
@@ -26,9 +26,9 @@ console.log(result.stderr);
 第3引数に文字列を渡すことで、CLIのツールの標準入力として扱われます。
 
 ```javascript
-import { ctm } from "@kokiito0926/cli2module";
+import { cli2module } from "@kokiito0926/cli2module";
 
-const result = await ctm("zx/cli", [], 'console.log("Hello, world!")');
+const result = await cli2module("zx/cli", [], 'console.log("Hello, world!")');
 console.log(result.code);
 console.log(result.stdout);
 console.log(result.stderr);
