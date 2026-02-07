@@ -1,6 +1,6 @@
 {
 	"name": "@kokiito0926/cli2module",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"private": false,
 	"description": "CLIのツールをワーカースレッドで実行することができるライブラリです。",
 	"keywords": [
