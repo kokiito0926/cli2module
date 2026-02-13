@@ -1,4 +1,4 @@
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { Worker } from "node:worker_threads";
 
 // zxのCLIのパスを取得しなければいけない。
@@ -15,12 +15,16 @@ function runInWorker(scriptPath, args = [], input = "") {
 	return new Promise((resolve, reject) => {
 		const workerCode = `
       import { workerData } from 'node:worker_threads';
-      // console.log(workerData.path);
-      // console.log(workerData.args);
       
       process.argv = ['node', workerData.path, ...workerData.args];
 
-      await import('file://' + workerData.path);
+      try {
+        await import('file:///' + workerData.path.replace(/\\\\/g, '/'));
+      } catch (err) {
+        // ワーカースレッド内での例外（構文エラーやインポートエラー等）を確実に投げ、
+        // 親スレッドの 'error' イベントでキャッチできるようにする。
+        throw err;
+      }
     `;
 
 		const worker = new Worker(workerCode, {
@@ -56,18 +60,33 @@ function runInWorker(scriptPath, args = [], input = "") {
 			});
 		});
 
-		worker.on("error", reject);
+		worker.on("error", (err) => {
+			reject(err);
+		});
 	});
 }
 
-export async function cli2module(specifier, options = [], input = "") {
-	const cliPath = await import.meta.resolve(specifier);
-	// console.log(cliPath);
+/**
+ * CLIツールをワーカースレッドで実行します。
+ * 
+ * @param {string} specifier 実行するCLIツールのパスまたはモジュール名
+ * @param {string[]} [args=[]] コマンドライン引数の配列
+ * @param {string} [input=""] 標準入力に渡す文字列
+ * @returns {Promise<{code: number, stdout: string, stderr: string}>}
+ */
+export async function cli2module(specifier, args = [], input = "") {
+	let cliUrl;
+	try {
+		// 相対パス（./ か ../）で始まる場合は、直感的な動作のために process.cwd() を基準に解決を試みる
+		if (specifier.startsWith("./") || specifier.startsWith("../")) {
+			cliUrl = pathToFileURL(path.resolve(process.cwd(), specifier)).href;
+		} else {
+			cliUrl = await import.meta.resolve(specifier);
+		}
+	} catch (err) {
+		throw new Error(`Failed to resolve specifier "${specifier}": ${err.message}`);
+	}
 
-	const cliPath2 = fileURLToPath(cliPath);
-	// console.log(cliPath2);
-
-	const result = await runInWorker(cliPath2, options, input);
-	// console.log(result);
-	return result;
+	const cliPath = fileURLToPath(cliUrl);
+	return await runInWorker(cliPath, args, input);
 }
