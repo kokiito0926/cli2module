@@ -66,14 +66,6 @@ function runInWorker(scriptPath, args = [], input = "") {
 	});
 }
 
-/**
- * CLIツールをワーカースレッドで実行します。
- * 
- * @param {string} specifier 実行するCLIツールのパスまたはモジュール名
- * @param {string[]} [args=[]] コマンドライン引数の配列
- * @param {string} [input=""] 標準入力に渡す文字列
- * @returns {Promise<{code: number, stdout: string, stderr: string}>}
- */
 export async function cli2module(specifier, args = [], input = "") {
 	let cliUrl;
 	try {
