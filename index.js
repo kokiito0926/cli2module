@@ -21,8 +21,6 @@ function runInWorker(scriptPath, args = [], input = "") {
       try {
         await import('file:///' + workerData.path.replace(/\\\\/g, '/'));
       } catch (err) {
-        // ワーカースレッド内での例外（構文エラーやインポートエラー等）を確実に投げ、
-        // 親スレッドの 'error' イベントでキャッチできるようにする。
         throw err;
       }
     `;
@@ -67,18 +65,7 @@ function runInWorker(scriptPath, args = [], input = "") {
 }
 
 export async function cli2module(specifier, args = [], input = "") {
-	let cliUrl;
-	try {
-		// 相対パス（./ か ../）で始まる場合は、直感的な動作のために process.cwd() を基準に解決を試みる
-		if (specifier.startsWith("./") || specifier.startsWith("../")) {
-			cliUrl = pathToFileURL(path.resolve(process.cwd(), specifier)).href;
-		} else {
-			cliUrl = await import.meta.resolve(specifier);
-		}
-	} catch (err) {
-		throw new Error(`Failed to resolve specifier "${specifier}": ${err.message}`);
-	}
-
+	const cliUrl = await import.meta.resolve(specifier);
 	const cliPath = fileURLToPath(cliUrl);
 	return await runInWorker(cliPath, args, input);
 }
